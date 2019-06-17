@@ -1,8 +1,10 @@
 package com.fundesplai.tictactoe;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Game {
@@ -17,7 +19,7 @@ public class Game {
         space = new Space();
     }
 
-    public void start() {
+    public void start() throws CloneNotSupportedException, PositionCantFollowVectorException {
 
         setRules();
 
@@ -27,17 +29,34 @@ public class Game {
         int turn = 0;
         int totalCells = Utils.getTotalCells(space);
         //While the game board isn't full and no one wins...
-        while (round * players.size() + (turn + 1) < totalCells || win) {
+        while (round * players.size() + (turn + 1) < totalCells && !win) {
 
             if (turn == players.size()) {
                 round++;
                 turn = 0;
             }
 
-            TUI.printTurnRound(round + 1, players.get(turn));
+            TUI.printTurnRound(round, players.get(turn));
             
+            stateOfGame(Utils.generateInitialSpaceCursor(space));
 
-        }
+            Position newPos = TUI.askPosition(space);
+            while (isOccupied(newPos)) {
+
+                TUI.printErrorExistingPosition();
+                newPos = TUI.askPosition(space);
+            }
+
+            players.get(turn).addPosition(newPos);
+
+            if (throughPlayerPositions(players.get(turn))) {
+
+                win = true;
+                TUI.winningMessage(players.get(turn));
+            }
+
+            turn++;
+        } 
     }
 
     private void setRules() {
@@ -53,7 +72,7 @@ public class Game {
     /**
      * Checks if the given position already exists on the game situation
      */
-    public boolean isOccupied(Position pos) {
+    private boolean isOccupied(Position pos) {
 
         for (Player player : players) {
 
@@ -69,20 +88,38 @@ public class Game {
         return false;
     }
 
-    public void throughPlayerPositions(Player player) {
+    private boolean throughPlayerPositions(Player player)
+            throws CloneNotSupportedException, PositionCantFollowVectorException {
 
         for (Position position : player.getPositions()) {
 
-            
+            Map<Vector, Position> adjacentPos = getAdjacentPositions(position);
+            for (Map.Entry<Vector, Position> entry : adjacentPos.entrySet()) {
+
+                Position vecPos = entry.getValue();
+                int count = 1;
+                while (player.hasPosition(vecPos)) {
+
+                    count++;
+                    vecPos = entry.getKey().nextPosFromGiven(vecPos);
+                }
+
+                if (count >= chainToWin) {
+
+                    return true;
+                }
+            }
         }
+
+        return false;
     }
 
-    public List<Position> getAdjacentPositions(Position position) throws CloneNotSupportedException {
+    private Map<Vector, Position> getAdjacentPositions(Position position) throws CloneNotSupportedException, PositionCantFollowVectorException {
 
-        List<Position> adjacentPositions = new ArrayList<Position>();
+        Map<Vector, Position> adjacentPositions = new HashMap<Vector, Position>();
         
         Set<Combination> combinations = new HashSet<Combination>();
-        Combinator combinator = new Combinator(Utils.fromSetToList(position.getCoordinates().keySet()));
+        Combinator combinator = new Combinator(Utils.fromAxisSetToList(position.getCoordinates().keySet()));
 
         Utils.getAllCombinations(combinations, combinator);
 
@@ -92,6 +129,16 @@ public class Game {
             vectors.addAll(Utils.inicDirCombination(comb));
         }
         
+        for (Vector vector : vectors) {
+
+            Position adjacentPosition = vector.nextPosFromGiven(position);
+            if (adjacentPosition != null) {
+
+                adjacentPositions.put(vector, adjacentPosition);
+            }
+        }
+
+        return adjacentPositions;
     }
 
     /**
@@ -100,7 +147,7 @@ public class Game {
      * @param players
      * @throws CloneNotSupportedException
      */
-    public static void stateOfGame(SpaceCursor sCursor, List<Player> players) throws CloneNotSupportedException {
+    private void stateOfGame(SpaceCursor sCursor) throws CloneNotSupportedException {
 
         SpaceCursor nextSCursor = null;
 
@@ -108,14 +155,14 @@ public class Game {
 
             nextSCursor = sCursor.clone();
             nextSCursor.nextDimension();
-            stateOfGame(nextSCursor, players);
+            stateOfGame(nextSCursor);
         }
 
         if (!(sCursor.isOnLimit())) {
 
             nextSCursor = sCursor.clone();
             nextSCursor.nextCell();
-            stateOfGame(nextSCursor, players);
+            stateOfGame(nextSCursor);
         }
 
         TUI.printStateOfGame(sCursor, players);
@@ -124,5 +171,9 @@ public class Game {
     public Space getSpace() {
 
         return space;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
     }
 }

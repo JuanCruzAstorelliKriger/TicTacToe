@@ -6,39 +6,60 @@ import java.util.LinkedHashMap;
 public class Position implements Cloneable {
 
     /**
-     * <IndexOfAxis,positionInAxis>
+     * <Axis,positionInAxis>
      */
-    private HashMap<Integer, Integer> coordinates;
+    private HashMap<Axis, Integer> coordinates;
 
     public Position() {
 
-        this.coordinates = new LinkedHashMap<Integer, Integer>();
+        this.coordinates = new LinkedHashMap<Axis, Integer>();
     }
 
     /**
-     * 
-     * @param axisIndex
-     * @return
+     * Increments or decrements the value of the given axis in function of the given boolean (representing the direction, positive or negative)
+     * @return true if the value was properly modified, false if the value couldn't been modified cause it was on the limit (initial or final, 0 or max)
      */
-    /* public boolean incrementValue(int axisIndex) {
+    public boolean inDeCrementValue(Axis axis, boolean direction) {
 
+        int value = coordinates.get(axis);
+
+        //If the value has to be incremented
+        if (direction) {
+
+            if (value == axis.getLimit()) {
+
+                return false;
+            }
+        }
+        //Else the value has to be decremented
+        else {
+
+            if (value == 0) {
+
+                return false;
+            }
+        }
+
+        coordinates.replace(axis, direction ? ++value : --value);
+        return true;
     }
 
-    public boolean decrementValue(int axisIndex) {
-        
-    } */
+    public void addAxis(Axis axis, int value) {
 
-    public void addAxis(int axisIndex, int value) {
-
-        this.coordinates.put(axisIndex, value);
+        this.coordinates.put(axis, value);
     }
 
-    public HashMap<Integer, Integer> getCoordinates() {
+    public boolean hasAxis(Axis axis) {
+
+        return coordinates.containsKey(axis);
+    }
+
+    public HashMap<Axis, Integer> getCoordinates() {
 
         return coordinates;
     }
 
-    public void setCoordinates(HashMap<Integer, Integer> coordinates) {
+    public void setCoordinates(HashMap<Axis, Integer> coordinates) {
 
         this.coordinates = coordinates;
     }
@@ -47,7 +68,7 @@ public class Position implements Cloneable {
     protected Position clone() throws CloneNotSupportedException {
 
         Position clone = (Position) super.clone();
-        clone.setCoordinates(new LinkedHashMap<Integer, Integer>(coordinates));
+        clone.setCoordinates(new LinkedHashMap<Axis, Integer>(coordinates));
 
         return clone;
     }

@@ -5,14 +5,14 @@ import java.util.Map;
 
 public class Vector {
 
-    private Map<Integer, Boolean> axisDirs;
+    private Map<Axis, Boolean> axisDirs;
 
     public Vector(Combination axis, boolean[] dirs) {
 
-        axisDirs = new HashMap<Integer, Boolean>();
+        axisDirs = new HashMap<Axis, Boolean>();
 
-        Integer[] axisCombs = axis.getAxisCombs();
-        if (axisCombs.length !=  dirs.length) {
+        Axis[] axisCombs = axis.getAxisCombs();
+        if (axisCombs.length != dirs.length) {
 
             throw new VectorCompsException();
         }
@@ -23,19 +23,41 @@ public class Vector {
         }
     }
 
-    public Map<Integer, Boolean> getAxisDirs() {
+    public Map<Axis, Boolean> getAxisDirs() {
 
         return axisDirs;
     }
 
     /**
      * Gets the immediate position corresponding to the current vector
-     * @param pos
-     * @return
+     * 
+     * @param pos The initial position
+     * @return The next Position within the vector that executes the method
+     * @throws CloneNotSupportedException
+     * @throws PositionCantFollowVectorException
      */
-    public Position nextPosFromGiven(Position pos) {
+    public Position nextPosFromGiven(Position pos)
+            throws CloneNotSupportedException, PositionCantFollowVectorException {
 
-        
+        Position nextPos = pos.clone();
+        //For every axis of the vector increments or decrements de value of the position for that axis, in function of the direction of the vector for that axis (positive or negative, true or false)
+        for (Map.Entry<Axis, Boolean> entry : this.axisDirs.entrySet()) {
+
+            if (nextPos.hasAxis(entry.getKey())) {
+
+                //If the value can't be modified because it's on the limit return null
+                if (!nextPos.inDeCrementValue(entry.getKey(), entry.getValue().booleanValue())) {
+
+                    return null;
+                }
+            }
+            else {
+
+                throw new PositionCantFollowVectorException(nextPos, this);
+            }
+        }
+
+        return nextPos;
     }
 
     @Override
@@ -67,12 +89,12 @@ public class Vector {
         else {
 
                 //- Then, if passes, by checking that in fact both combinations have the same axis (no matters the order)
-            for (Integer axisThis : this.axisDirs.keySet()) {
+            for (Axis axisThis : this.axisDirs.keySet()) {
 
                 boolean exists = false;
-                for (Integer axisOther : other.getAxisDirs().keySet()) {
+                for (Axis axisOther : other.getAxisDirs().keySet()) {
 
-                    if (axisThis.intValue() == axisOther.intValue()) {
+                    if (axisThis.equals(axisOther)) {
 
                         exists = true;
                     }
@@ -85,7 +107,7 @@ public class Vector {
             }
 
             //At last, confirms that every axis has the same direction in both combinations (true or false, positive or negative dir)
-            for (Integer axisThis : this.axisDirs.keySet()) {
+            for (Axis axisThis : this.axisDirs.keySet()) {
 
                 if (this.axisDirs.get(axisThis) != other.getAxisDirs().get(axisThis)) {
 

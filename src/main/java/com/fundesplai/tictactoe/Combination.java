@@ -4,14 +4,14 @@ import java.util.Arrays;
 
 public class Combination {
 
-    private Integer[] axisCombs;
+    private Axis[] axisCombs;
 
-    public Combination(Integer[] axisCombs) {
+    public Combination(Axis[] axisCombs) {
 
         this.axisCombs = axisCombs;
     }
 
-    public Integer[] getAxisCombs() {
+    public Axis[] getAxisCombs() {
 
         return axisCombs;
     }
@@ -45,7 +45,7 @@ public class Combination {
             boolean hasIt = false;
             for (int e = 0 ; e < other.getAxisCombs().length ; e++) {
 
-                if (this.axisCombs[i] == other.getAxisCombs()[e]) {
+                if (this.axisCombs[i].equals(getAxisCombs()[e])) {
 
                     hasIt = true;
                 }

@@ -28,7 +28,7 @@ public class Utils {
 
         for (Axis axis : space.getDimensions()) {
             
-            pos.addAxis(axis.getIndex(), 0);
+            pos.addAxis(axis, 0);
         }
     
         return pos;
@@ -165,10 +165,10 @@ public class Utils {
         return total;
     }
 
-    public static List<Integer> fromSetToList(Set<Integer> set) {
+    public static List<Axis> fromAxisSetToList(Set<Axis> set) {
 
-        List<Integer> list = new ArrayList<Integer>();
-        for (Integer elem : set) {
+        List<Axis> list = new ArrayList<Axis>();
+        for (Axis elem : set) {
 
             list.add(elem);
         }

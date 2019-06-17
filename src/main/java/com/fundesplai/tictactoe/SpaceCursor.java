@@ -46,7 +46,7 @@ public class SpaceCursor implements Cloneable {
      */
     public boolean isOnLimit() {
 
-        return position.getCoordinates().get(currentAxis) == space.getAxis(currentAxis).getLimit() - 1;
+        return position.getCoordinates().get(space.getAxis(currentAxis)) == space.getAxis(currentAxis).getLimit() - 1;
 
     }
 
@@ -55,7 +55,7 @@ public class SpaceCursor implements Cloneable {
      */
     public boolean isOnInit() {
 
-        return position.getCoordinates().get(currentAxis) == 0;
+        return position.getCoordinates().get(space.getAxis(currentAxis)) == 0;
     }
 
     /**
@@ -71,8 +71,8 @@ public class SpaceCursor implements Cloneable {
      */
     public void nextCell() {
 
-        int currentPos = position.getCoordinates().get(currentAxis);
-        position.getCoordinates().replace(currentAxis, currentPos + 1);
+        int currentPos = position.getCoordinates().get(space.getAxis(currentAxis));
+        position.getCoordinates().replace(space.getAxis(currentAxis), currentPos + 1);
     }
 
     @Override

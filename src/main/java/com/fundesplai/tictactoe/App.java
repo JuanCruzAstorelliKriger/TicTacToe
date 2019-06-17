@@ -17,21 +17,17 @@ import javax.print.attribute.standard.PrinterInfo;
 public class App {
     public static void main(String[] args) {
 
-        Integer[] inte = {0};
-        Combination comb = new Combination(inte);
+        Game game = new Game();
 
-        Set<Vector> vecs = Utils.inicDirCombination(comb);
-        
-        int i = 0;
-        for (Vector vec : vecs) {
-
-            System.out.println("----Vec " + i);
-            for (Map.Entry<Integer, Boolean> entry : vec.getAxisDirs().entrySet()) {
-
-                System.out.println("Ax: " + entry.getKey() + " / dir: " + entry.getValue());
-            }
-            System.out.println();
-            i++;
+        try {
+            game.start();
+        } catch (CloneNotSupportedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (PositionCantFollowVectorException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
+        
     }
 }

@@ -6,15 +6,15 @@ import java.util.List;
 public class Combinator implements Cloneable {
 
     //Elements to combine
-    private List<Integer> axisIndexes;
+    private List<Axis> axis;
     //A collection of pointers to referenciate simultaneously different elements of axisIndexes
     private List<Integer> pointers;
     //An auxiliar pointer that refers to a pointer of the list pointers in order to increment them and add new pointers
     private int auxPointer;
 
-    public Combinator(List<Integer> axisIndexes) {
+    public Combinator(List<Axis> axis) {
 
-        this.axisIndexes = axisIndexes;
+        this.axis = axis;
         this.pointers = new ArrayList<Integer>();
         this.pointers.add(0);
         this.auxPointer = 0;
@@ -27,7 +27,7 @@ public class Combinator implements Cloneable {
 
     public boolean isFirstPointerAtLastPosition() {
 
-        return pointers.get(0) == axisIndexes.size() - pointers.size();
+        return pointers.get(0) == axis.size() - pointers.size();
     }
 
     /**
@@ -37,7 +37,7 @@ public class Combinator implements Cloneable {
      */
     public boolean isntCurrentPointerAtLastPosition() {
 
-        return pointers.get(auxPointer) < axisIndexes.size() - (pointers.size() - auxPointer);
+        return pointers.get(auxPointer) < axis.size() - (pointers.size() - auxPointer);
     }
 
     /**
@@ -85,11 +85,11 @@ public class Combinator implements Cloneable {
      */
     public Combination getCombination() {
 
-        Integer[] combination = new Integer[pointers.size()];
+        Axis[] combination = new Axis[pointers.size()];
         int i = 0;
         for (Integer pointer : pointers) {
 
-            combination[i] = axisIndexes.get(pointer);
+            combination[i] = axis.get(pointer);
             i++;
         }
 
